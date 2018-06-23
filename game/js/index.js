@@ -4,6 +4,8 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 let modalDialogue = document.querySelector('.modal-dialogue');
 let spellsWindow = document.querySelector('.spells');
+let taskWindow = document.querySelector('.task-window');
+let castSpellBtn = taskWindow.querySelector('button');
 
 let user = {
   url: 'images/boy.png',
@@ -22,7 +24,7 @@ let monster = {
   sx: 0,
   sy: 50,
   coef: 3,
-  hp: 100
+  hp: 50
 };
 
 let activeSpell;
@@ -65,27 +67,6 @@ function init() {
   main();
 }
 
-spellsWindow.addEventListener("click", clickHandler, false);
-
-function clickHandler(event) {
-  if(event.target.tagName === 'IMG' ||
-     event.target.tagName === 'FIGCAPTION') {
-    let spellType = event.target.closest('figure').children[1].innerText.toLowerCase();
-    let dir;
-    let pos;
-    if (spellType === 'cure') {
-      dir = 'vertical';
-      pos = [user.pos[0] - 10, 400];
-    } else {
-      dir = 'horizontal';
-      pos = [user.pos[0], user.pos[1]];
-    }
-    let spell = new Spell(spellsUrl[spellType], spellType, pos, [100, 100], spellsSpeed[spellType], dir);
-    modalDialogue.classList.add('hidden');
-    activeSpell = spell;
-  }
-}
-
 function main() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   update();
@@ -94,10 +75,11 @@ function main() {
 }
 
 function update() {
-  if(activeSpell) {
+  if(activeSpell instanceof Spell) {
     checkSpell();
   }
   if(activeSpell === null) {
+    activeSpell = 'not-ready';
     createSpell();
   }
 }
@@ -112,6 +94,7 @@ function checkGame() {
     }
     document.querySelector('.end-msg p').innerText = msg;
     document.querySelector('.end-msg').classList.remove('hidden');
+    modalDialogue.classList.add('hidden');
     return true;
   }
   return false;
@@ -120,7 +103,7 @@ function checkGame() {
 function checkSpell() {
   if (activeSpell.type !== 'cure') {
     let finalX;
-    if (move == 'user') {
+    if (move === 'user') {
       finalX = monster.pos[0];
     } else {
       finalX = user.pos[0];
@@ -168,7 +151,7 @@ function checkSpell() {
 function createSpell() {
   if(checkGame()) { return }
   if(move === 'monster') {
-    let i = Math.ceil(Math.random()*10)%3;
+    let i = Math.ceil(Math.random() * 10) % 3;
     spellType = Object.keys(spellsSpeed)[i];
     let pos;
     let dir;
@@ -210,7 +193,7 @@ function renderCharacter(entity) {
 }
 
 function renderSpell(activeSpell) {
-  if(activeSpell) {
+  if(activeSpell instanceof Spell) {
     activeSpell.render(ctx);
   }   
 }
@@ -259,3 +242,87 @@ function drawName(type, name) {
   ctx.fillStyle = "black";
   ctx.fillText(name, x, y);
 }
+
+function chooseSpell(event) {
+  if(event.target.tagName.toLowerCase() === 'img' ||
+     event.target.tagName.toLowerCase() === 'figcaption') {
+    let spellType = event.target.closest('figure').children[1].innerText.toLowerCase(); 
+    modalDialogue.classList.add('hidden');
+    checkSolutionOfTask()
+      .then(() => {
+        if (spellType === 'explosion') {
+          return checkSolutionOfTask();
+        }
+      })
+      .then(() => {
+        taskWindow.classList.add('hidden');
+        buildSpell(spellType);
+      })
+      .catch((taskAnswer) => {
+        let pNote = taskWindow.querySelector('.note');
+        pNote.innerHTML = `Sorry, but your answer is wrong. The right answer is <span>${taskAnswer}</span>.`;
+        passMoveToMonster();
+      });
+  }
+}
+
+function checkSolutionOfTask() {
+  return new Promise(function(resolve, reject) {
+    taskWindow.classList.remove('hidden');
+    let task = createTask();
+    let handler = function(event) {
+      return checkAnswer(event, task, handler, resolve, reject);
+    };
+    castSpellBtn.addEventListener('click', handler, false);
+  });
+}
+
+function createTask() {
+  let task = new Task('math');
+  task.generateTask();
+  task.render(taskWindow);
+  return task;
+}
+
+function checkAnswer(event, task, handler, resolve, reject) {
+  castSpellBtn.removeEventListener('click', handler, false);
+  let input = event.target.closest('section').querySelector('input');
+
+  if (task.checkAnswer(Number(input.value))) {
+    resolve();
+  } else {
+    reject(task.answer);
+  }
+}
+
+function buildSpell(spellType) {
+  let dir;
+  let pos;
+  if (spellType === 'cure') {
+    dir = 'vertical';
+    pos = [user.pos[0] - 10, 400];
+  } else {
+    dir = 'horizontal';
+    pos = [user.pos[0], user.pos[1]];
+  }
+    
+  let spell = new Spell(spellsUrl[spellType], spellType, pos, [100, 100], spellsSpeed[spellType], dir);
+  activeSpell = spell;
+}
+
+async function passMoveToMonster() {
+  await resolveAfter(5000);
+  taskWindow.classList.add('hidden');
+  move = 'monster';
+  activeSpell = null;
+}
+
+function resolveAfter(time) {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve();
+    }, time);
+  });
+}
+
+spellsWindow.addEventListener('click', chooseSpell, false);

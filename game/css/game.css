@@ -26,13 +26,14 @@ canvas {
   margin-top: 20%;
 }
 
-.modal-dialogue {
+.modal-dialogue,
+.task-window {
   font-size: 0px;
   text-align: center;
   font-family: Georgia;
 	background: #d1f1ff;
 	background-image: url("../../images/bg.png");
-	height: 300px;
+	height: 320px;
 	width: 500px;
 	position: absolute;
 	top: 30%;
@@ -45,7 +46,8 @@ canvas {
    rgba(0,0,0,.8) 3px 3px 8px -3px;
 }
 
-.modal-dialogue p {
+.modal-dialogue p,
+.task-window p {
   font-size: 40px;
   margin: 20px 0px 10px;
 }
@@ -84,4 +86,67 @@ canvas {
 
 .hidden {
   display: none;
+}
+
+.task div {
+  display: inline-block;
+  margin: 20px 10px;
+  font-size: 26px;
+  height: 45px;
+  width: 45px;
+  border: 1px solid #0865b0;
+  border-radius: 5px;
+  background: #1ab8ff;
+  line-height: 160%;
+}
+
+.task-window input {
+  border: 1px solid #898989; 
+  border-radius: 5px;
+  padding: 0px 10px;
+  margin: 0px 15px;
+  box-sizing: border-box;
+  background: #ffffff !important;
+  outline: none;
+  height: 32px;
+  width: 65px;
+  color: #252525;
+  font-size: 20px;
+  font-family: Georgia;
+  text-align: center;
+}
+
+.task-window input:focus {
+  border: 2px solid #a2a2a2;
+}
+
+.task-window div {
+  margin-bottom: 20px;
+}
+
+.task-window button {
+  font-family: Georgia;
+  height: 32px;
+  width: 120px;
+  font-size: 18px;
+  padding: 5px 0px;
+  border-radius: 5px;
+  background: #00c1af;
+  outline: none;
+}
+
+.task-window button:hover {
+  cursor: pointer;
+  background: #01ac9c;
+}
+
+.task-window .note {
+  font-size: 25px;
+  color: #380241;
+}
+
+.task-window .note span {
+  color: #009688;
+  font-style: italic;
+  text-decoration: underline;
 }
