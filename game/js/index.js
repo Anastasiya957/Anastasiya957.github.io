@@ -88,6 +88,7 @@ function checkSpellDestination() {
   } else if (activeSpell.type === 'cure') {
     let finalY;
     finalY = (move ==='user') ? user.pos[1] : monster.pos[1];
+    finalY -= 40;
     if (activeSpell.pos[1] >= finalY) {
       if (move === 'user') {
         user.hp += activeSpell.HP;
@@ -113,7 +114,7 @@ function createSpell() {
     if (spellType === 'cure') {
       pos = [monster.pos[0] - 10, monster.pos[1] - 220];
     } else {
-      pos = [monster.pos[0], monster.pos[1] - 15];
+      pos = [monster.pos[0], monster.pos[1] - 35];
     }
     let spell = new Spell(spellType, pos, move);
     activeSpell = spell;
@@ -176,6 +177,7 @@ function render() {
   renderHPLine(monster.type, monster.hp);
   renderName(user.type, user.name);
   renderName(monster.type, monster.name);
+  renderDefetedMonsters();
   renderSpell(activeSpell);
 };
 
@@ -228,6 +230,15 @@ function renderName(type, name) {
   ctx.font = "20px Georgia";
   ctx.fillStyle = "black";
   ctx.fillText(name, x, y);
+}
+
+function renderDefetedMonsters() {
+  let x = 60;
+  let y = 120;
+  let defMonsters = user.defeatedMonsters;
+  ctx.font = "16px Georgia";
+  ctx.fillStyle = "#252525";
+  ctx.fillText(`Defeated Monsters: ${defMonsters}`, x, y);
 }
 
 function chooseSpell(event) {
