@@ -29,12 +29,12 @@ class Task {
         this.task = [a, op, b];
       }
     } else if (op === '*') {
-      a = Math.ceil(Math.random() * 100) % 50;
+      a = Math.ceil(Math.random() * 100) % 51;
       b = Math.ceil(Math.random() * 10);
       this.task = (Math.random() > 0.5) ? [a, op, b] : [b, op, a];
     } else {
       a = Math.ceil(Math.random() * 10);
-      let k = Math.ceil(Math.random() * 50);
+      let k = Math.ceil(Math.random() * 51);
       b = a * k;
       this.task = [b, op, a];
     }
@@ -82,5 +82,12 @@ class Task {
     while (elem.lastChild) {
       elem.removeChild(elem.lastChild);
     }
+  }
+
+  static create(type = 'math') {
+    let task = new Task(type);
+    task.generateTask();
+    task.render(taskWindow);
+    return task;
   }
 }

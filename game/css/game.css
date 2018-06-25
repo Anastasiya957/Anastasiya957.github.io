@@ -2,6 +2,7 @@
   padding: 0;
   margin: 0;
 }
+
 canvas {
   background: #eee;
   background-image: url("../images/game-bg2.jpg");
@@ -10,8 +11,14 @@ canvas {
   margin: 0 auto;
 }
 
+body {
+  background-image: url("../../images/bg.png");
+  background-repeat: repeat;
+}
+
 .greeting,
-.end-msg {
+.end-msg,
+.game-records {
   position: absolute;
   top: 0;
   width: 100%;
@@ -27,7 +34,8 @@ canvas {
 }
 
 .modal-dialogue,
-.task-window {
+.task-window,
+.user-info {
   font-size: 0px;
   text-align: center;
   font-family: Georgia;
@@ -36,7 +44,7 @@ canvas {
 	height: 320px;
 	width: 500px;
 	position: absolute;
-	top: 30%;
+	top: 25%;
 	left: 50%;
 	margin-left: -250px;
 	border-radius: 15px;
@@ -46,9 +54,67 @@ canvas {
    rgba(0,0,0,.8) 3px 3px 8px -3px;
 }
 
-.modal-dialogue p,
-.task-window p {
+.user-info .info {
+  text-align: left;
+  padding: 10px 90px;
+}
+
+.info input[type='text'] {
+  width: 205px;
+}
+
+.info p {
+  font-size: 26px;
+  display: inline-block;
+  margin: 15px 0px;
+  color: #000000;
+}
+
+.radio-btn p:nth-of-type(1) {
+  margin-left: 20px;
+  margin-right: 80px;
+}
+
+.info p span {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  background: white;
+  border: 1px solid black;
+  border-radius: 50%;
+}
+
+.info div.radio-btn p:hover {
+  cursor: pointer;
+}
+
+.info div.radio-btn .selected span {
+  background: gray;
+}
+
+.info button {
+  font-family: Georgia;
+  height: 40px;
+  width: 200px;
+  font-size: 24px;
+  margin-top: 20px;
+  margin-left: 65px;
+  padding: 5px 0px;
+  border-radius: 10px;
+  background: #00bcd4;
+  outline: none;
+}
+
+.info button:hover {
+  cursor: pointer;
+  background: #00a9bf;
+}
+
+.modal-dialogue h2,
+.task-window h2,
+.user-info h2 {
   font-size: 40px;
+  font-weight: normal;
   margin: 20px 0px 10px;
 }
 
@@ -100,7 +166,8 @@ canvas {
   line-height: 160%;
 }
 
-.task-window input {
+.task-window input,
+.info input[type='text'] {
   border: 1px solid #898989; 
   border-radius: 5px;
   padding: 0px 10px;
@@ -109,14 +176,18 @@ canvas {
   background: #ffffff !important;
   outline: none;
   height: 32px;
-  width: 65px;
   color: #252525;
   font-size: 20px;
   font-family: Georgia;
   text-align: center;
 }
 
-.task-window input:focus {
+.task-window input {
+  width: 65px;
+}
+
+.task-window input:focus,
+.info input[type='text']:focus {
   border: 2px solid #a2a2a2;
 }
 
@@ -124,18 +195,24 @@ canvas {
   margin-bottom: 20px;
 }
 
-.task-window button {
+.task-window button,
+.game-records button {
   font-family: Georgia;
-  height: 32px;
-  width: 120px;
-  font-size: 18px;
   padding: 5px 0px;
   border-radius: 5px;
   background: #00c1af;
   outline: none;
 }
 
-.task-window button:hover {
+.task-window button {
+  height: 32px;
+  width: 120px;
+  font-size: 18px;
+
+}
+
+.task-window button:hover,
+.game-records button:hover {
   cursor: pointer;
   background: #01ac9c;
 }
@@ -149,4 +226,50 @@ canvas {
   color: #009688;
   font-style: italic;
   text-decoration: underline;
+}
+
+.game-records h2 {
+  font-size: 50px;
+  margin: 40px 0px;
+}
+
+.game-records button {
+  margin-top: 40px;
+  height: 40px;
+  width: 160px;
+  font-size: 20px;
+}
+
+table {
+  margin: 0px auto;
+  width: 500px;
+  border-collapse: collapse;
+}
+
+thead {
+  background-color: #38a7ff;
+  font-size: 24px;
+}
+
+tbody {
+  font-size: 20px;
+}
+
+tbody tr:nth-child(2n + 1) {
+  background-color: #f3f3f3;
+}
+
+tbody tr:nth-child(2n) {
+  background-color: #deebff;
+}
+
+tr td:first-child,
+tr th:first-child {
+  width: 50%;
+}
+
+td, th {
+  border: 1px solid black;
+  text-align: center;
+  padding: 5px 0px;
 }

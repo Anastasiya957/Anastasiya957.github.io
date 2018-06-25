@@ -1,70 +1,54 @@
-let canvas = document.getElementById("myCanvas");
+let canvas = document.getElementById('myCanvas');
+let userInfo = document.querySelector('.info');
 let ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
+let greetingWindow = document.querySelector('.greeting');
 let modalDialogue = document.querySelector('.modal-dialogue');
 let spellsWindow = document.querySelector('.spells');
 let taskWindow = document.querySelector('.task-window');
 let castSpellBtn = taskWindow.querySelector('button');
+let recordsWindow = document.querySelector('.game-records');
 
-let user = {
-  url: 'images/boy.png',
-  pos: [300, 600],
-  size: [35, 55],
-  sx: 55,
-  sy: 135,
-  coef: 2,
-  hp: 100
-};
-
-let monster = {
-  url: 'images/slimeMonster.png',
-  pos: [canvas.width - user.pos[0], 650],
-  size: [25, 25],
-  sx: 0,
-  sy: 50,
-  coef: 3,
-  hp: 50
-};
+let user;
+let sex = 'male';
+let monster = new Character('Monster', 'monster');
 
 let activeSpell;
 let move = 'user';
 let isGameOver = false;
 
-let spellsSpeed = {
-  'attack' : 10,
-  'explosion' : 15,
-  'cure' : 6
-};
-
-let spellsUrl = {
-  'attack' : 'images/spell2.png',
-  'explosion' : 'images/bigSpell2.png',
-  'cure' : 'images/cure22.png'
+if (!localStorage.getItem('Records')) {
+  localStorage.setItem('Records', JSON.stringify({}));
 }
 
-let spellsHP = {
-  'attack' : 15,
-  'explosion' : 20,
-  'cure' : 18
-}
-
-resources.load([
-    'images/boy.png',
-    'images/slimeMonster.png',
+function startGame() {
+  let name = userInfo.querySelector('input[name="name"]').value;
+  name = name ? name : 'User';
+  user = new Character(name, 'user', sex);
+  records.saveCurrentUser(name, sex);
+  document.querySelector('.user-info').classList.add('hidden');
+  greetingWindow.classList.remove('hidden');
+  resources.load([
+    'images/boy2.png',
+    'images/girl2.png',
+    'images/slimeMonster1.png',
     'images/spell2.png',
     'images/bigSpell2.png',
     'images/cure22.png'
-]);
-resources.onReady(init);
+  ]);
+  resources.onReady(init);
+}
 
 function init() {
-  setTimeout(function() {
-    document.querySelector('.greeting').classList.add('hidden');
-    modalDialogue.classList.remove('hidden');
-  }, 1500);
-
+  startRound();
   main();
+}
+
+async function startRound() {
+  await resolveAfter(2000);
+  greetingWindow.classList.add('hidden');
+  modalDialogue.classList.remove('hidden');
 }
 
 function main() {
@@ -76,7 +60,7 @@ function main() {
 
 function update() {
   if(activeSpell instanceof Spell) {
-    checkSpell();
+    checkSpellDestination();
   }
   if(activeSpell === null) {
     activeSpell = 'not-ready';
@@ -84,60 +68,32 @@ function update() {
   }
 }
 
-function checkGame() {
-  if (isGameOver) {
-    let msg;
-    if (monster.hp === 0) {
-      msg = 'Congratulations! You won!';
-    } else {
-      msg = 'Game over.';
-    }
-    document.querySelector('.end-msg p').innerText = msg;
-    document.querySelector('.end-msg').classList.remove('hidden');
-    modalDialogue.classList.add('hidden');
-    return true;
-  }
-  return false;
-}
-
-function checkSpell() {
+function checkSpellDestination() {
   if (activeSpell.type !== 'cure') {
     let finalX;
-    if (move === 'user') {
-      finalX = monster.pos[0];
-    } else {
-      finalX = user.pos[0];
-    }
+    finalX = (move ==='user') ? monster.pos[0] : user.pos[0];
     if (move === 'user') {
       if (activeSpell.pos[0] >= finalX) {
-        monster.hp -= spellsHP[activeSpell.type];
-        monster.hp = (monster.hp >= 0) ? monster.hp : 0;
+        monster.hp -= activeSpell.HP;
         activeSpell = null;
         move = 'monster';
       }
     } else {
       if (activeSpell.pos[0] <= finalX) {
-        user.hp -= spellsHP[activeSpell.type];
-        user.hp = (user.hp >= 0) ? user.hp : 0;
+        user.hp -= activeSpell.HP;
         activeSpell = null;
         move = 'user';
       }
     }
   } else if (activeSpell.type === 'cure') {
     let finalY;
-    if (move == 'user') {
-      finalY = user.pos[1];
-    } else {
-      finalY = monster.pos[1];
-    }
+    finalY = (move ==='user') ? user.pos[1] : monster.pos[1];
     if (activeSpell.pos[1] >= finalY) {
       if (move === 'user') {
-        user.hp += spellsHP[activeSpell.type];
-        user.hp = (user.hp <= 100) ? user.hp : 100;
+        user.hp += activeSpell.HP;
         move = 'monster';
       } else {
-        monster.hp += spellsHP[activeSpell.type];
-        monster.hp = (monster.hp <= 100) ? monster.hp : 100;
+        monster.hp += activeSpell.HP;
         move = 'user';
       }
       activeSpell = null;
@@ -152,20 +108,14 @@ function createSpell() {
   if(checkGame()) { return }
   if(move === 'monster') {
     let i = Math.ceil(Math.random() * 10) % 3;
-    spellType = Object.keys(spellsSpeed)[i];
+    spellType = Spell.types[i];
     let pos;
-    let dir;
-    let speed;
     if (spellType === 'cure') {
-      dir = 'vertical';
-      pos = [monster.pos[0] - 10, 400];
-      speed = spellsSpeed[spellType];
+      pos = [monster.pos[0] - 10, monster.pos[1] - 220];
     } else {
-      dir = 'horizontal';
       pos = [monster.pos[0], monster.pos[1] - 15];
-      speed = -spellsSpeed[spellType];
     }
-    let spell = new Spell(spellsUrl[spellType], spellType, pos, [100, 100], speed, dir);
+    let spell = new Spell(spellType, pos, move);
     activeSpell = spell;
   }
   if(move === 'user') {
@@ -173,24 +123,61 @@ function createSpell() {
   }
 }
 
+function checkGame() {
+  if (isGameOver) {
+    let msg;
+    if (monster.hp === 0) {
+      msg = 'Congratulations! You won!';
+    } else {
+      msg = 'Game over.';
+    }
+    document.querySelector('.end-msg p').innerText = msg;
+    document.querySelector('.end-msg').classList.remove('hidden');
+    modalDialogue.classList.add('hidden');
+    
+    if (monster.hp === 0) {
+      resetGame();
+    } else {
+      records.add(user.defeatedMonsters);
+      endGame();
+    }
+    return true;
+  }
+  return false;
+}
+
+async function resetGame() {
+  await resolveAfter(2000);
+  document.querySelector('.end-msg').classList.add('hidden');
+  modalDialogue.classList.remove('hidden');
+  isGameOver = false;
+  move = 'user';
+  resetData();
+}
+
+function resetData() {
+  user.hp = 100;
+  user.defeatedMonsters += 1;
+  monster.hp = 100;
+}
+
+async function endGame() {
+  await resolveAfter(2000);
+  document.querySelector('.end-msg').classList.add('hidden');
+  canvas.classList.add('hidden');
+  recordsWindow.classList.remove('hidden');
+  records.render(recordsWindow.querySelector('table'));
+}
+
 function render() {
-  renderCharacter(user);
-  renderCharacter(monster);
-  drawHPLine('user', user.hp);
-  drawHPLine('monster', monster.hp);
-  drawName('user','User');
-  drawName('monster','Monster');
+  user.render(ctx);
+  monster.render(ctx);
+  renderHPLine(user.type, user.hp);
+  renderHPLine(monster.type, monster.hp);
+  renderName(user.type, user.name);
+  renderName(monster.type, monster.name);
   renderSpell(activeSpell);
 };
-
-function renderCharacter(entity) {
-  ctx.drawImage(resources.get(entity.url), 
-                entity.sx, entity.sy,
-                entity.size[0], entity.size[1],
-                entity.pos[0], entity.pos[1],
-                entity.size[0] * entity.coef,
-                entity.size[1] * entity.coef);
-}
 
 function renderSpell(activeSpell) {
   if(activeSpell instanceof Spell) {
@@ -198,7 +185,7 @@ function renderSpell(activeSpell) {
   }   
 }
 
-function drawHPLine(type, hp) {
+function renderHPLine(type, hp) {
   let hpHeight = 30;
   let hpWidth = hp * 2;
   let y = 50;
@@ -229,7 +216,7 @@ function drawHPLine(type, hp) {
   ctx.fillText(hp, x + 90, y + 20);
 }
 
-function drawName(type, name) {
+function renderName(type, name) {
   let x;
   let y = 100;
   if (type === "user") {
@@ -269,19 +256,12 @@ function chooseSpell(event) {
 function checkSolutionOfTask() {
   return new Promise(function(resolve, reject) {
     taskWindow.classList.remove('hidden');
-    let task = createTask();
+    let task = Task.create();
     let handler = function(event) {
       return checkAnswer(event, task, handler, resolve, reject);
     };
     castSpellBtn.addEventListener('click', handler, false);
   });
-}
-
-function createTask() {
-  let task = new Task('math');
-  task.generateTask();
-  task.render(taskWindow);
-  return task;
 }
 
 function checkAnswer(event, task, handler, resolve, reject) {
@@ -296,17 +276,13 @@ function checkAnswer(event, task, handler, resolve, reject) {
 }
 
 function buildSpell(spellType) {
-  let dir;
   let pos;
   if (spellType === 'cure') {
-    dir = 'vertical';
-    pos = [user.pos[0] - 10, 400];
+    pos = [user.pos[0] - 10, user.pos[1] - 220];
   } else {
-    dir = 'horizontal';
     pos = [user.pos[0], user.pos[1]];
   }
-    
-  let spell = new Spell(spellsUrl[spellType], spellType, pos, [100, 100], spellsSpeed[spellType], dir);
+  let spell = new Spell(spellType, pos, move);
   activeSpell = spell;
 }
 
@@ -325,4 +301,22 @@ function resolveAfter(time) {
   });
 }
 
+function chooseGender(event) {
+  if(event.target.closest('p')) {
+    let children = event.target.closest('div').children;
+    for (let i = 0; i < children.length; i++) {
+      children[i].classList.remove('selected');
+    }
+    event.target.closest('p').classList.add('selected');
+    sex = event.target.closest('p').innerText.toLowerCase();
+  }
+}
+
+function reload() {
+  document.location.reload();
+}
+
+userInfo.querySelector('.radio-btn').addEventListener('click', chooseGender, false);
+userInfo.querySelector('button').addEventListener('click', startGame, false);
 spellsWindow.addEventListener('click', chooseSpell, false);
+recordsWindow.querySelector('button').addEventListener('click', reload, false);
