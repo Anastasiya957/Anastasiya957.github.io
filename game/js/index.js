@@ -12,8 +12,7 @@ let recordsWindow = document.querySelector('.game-records');
 
 let user;
 let sex = 'male';
-let monster = new Character('Monster', 'monster');
-
+let monster = new Monster();
 let activeSpell;
 let move = 'user';
 let isGameOver = false;
@@ -25,7 +24,7 @@ if (!localStorage.getItem('Records')) {
 function startGame() {
   let name = userInfo.querySelector('input[name="name"]').value;
   name = name ? name : 'User';
-  user = new Character(name, 'user', sex);
+  user = new User(name, sex);
   records.saveCurrentUser(name, sex);
   document.querySelector('.user-info').classList.add('hidden');
   greetingWindow.classList.remove('hidden');
@@ -35,7 +34,16 @@ function startGame() {
     'images/slimeMonster1.png',
     'images/spell2.png',
     'images/bigSpell2.png',
-    'images/cure22.png'
+    'images/cure22.png',
+    'images/monster-parts/head1.png',
+    'images/monster-parts/head2.png',
+    'images/monster-parts/head3.png',
+    'images/monster-parts/torso1.png',
+    'images/monster-parts/torso2.png',
+    'images/monster-parts/torso3.png',
+    'images/monster-parts/feet1.png',
+    'images/monster-parts/feet2.png',
+    'images/monster-parts/feet3.png',
   ]);
   resources.onReady(init);
 }
@@ -71,7 +79,7 @@ function update() {
 function checkSpellDestination() {
   if (activeSpell.type !== 'cure') {
     let finalX;
-    finalX = (move ==='user') ? monster.pos[0] : user.pos[0];
+    finalX = (move ==='user') ? monster.startPoint[0] : user.pos[0];
     if (move === 'user') {
       if (activeSpell.pos[0] >= finalX) {
         monster.hp -= activeSpell.HP;
@@ -87,7 +95,7 @@ function checkSpellDestination() {
     }
   } else if (activeSpell.type === 'cure') {
     let finalY;
-    finalY = (move ==='user') ? user.pos[1] : monster.pos[1];
+    finalY = (move ==='user') ? user.pos[1] : monster.startPoint[1];
     finalY -= 40;
     if (activeSpell.pos[1] >= finalY) {
       if (move === 'user') {
@@ -108,16 +116,7 @@ function checkSpellDestination() {
 function createSpell() {
   if(checkGame()) { return }
   if(move === 'monster') {
-    let i = Math.ceil(Math.random() * 10) % 3;
-    spellType = Spell.types[i];
-    let pos;
-    if (spellType === 'cure') {
-      pos = [monster.pos[0] - 10, monster.pos[1] - 220];
-    } else {
-      pos = [monster.pos[0], monster.pos[1] - 35];
-    }
-    let spell = new Spell(spellType, pos, move);
-    activeSpell = spell;
+    activeSpell = monster.createSpell();
   }
   if(move === 'user') {
     modalDialogue.classList.remove('hidden');
@@ -159,7 +158,7 @@ async function resetGame() {
 function resetData() {
   user.hp = 100;
   user.defeatedMonsters += 1;
-  monster.hp = 100;
+  monster = new Monster();
 }
 
 async function endGame() {
@@ -173,10 +172,10 @@ async function endGame() {
 function render() {
   user.render(ctx);
   monster.render(ctx);
-  renderHPLine(user.type, user.hp);
-  renderHPLine(monster.type, monster.hp);
-  renderName(user.type, user.name);
-  renderName(monster.type, monster.name);
+  renderHPLine('user', user.hp);
+  renderHPLine('monster', monster.hp);
+  renderName('user', user.name);
+  renderName('monster', monster.name);
   renderDefetedMonsters();
   renderSpell(activeSpell);
 };
@@ -254,7 +253,7 @@ function chooseSpell(event) {
       })
       .then(() => {
         taskWindow.classList.add('hidden');
-        buildSpell(spellType);
+        activeSpell = user.createSpell(spellType);
       })
       .catch((taskAnswer) => {
         let pNote = taskWindow.querySelector('.note');
@@ -284,17 +283,6 @@ function checkAnswer(event, task, handler, resolve, reject) {
   } else {
     reject(task.answer);
   }
-}
-
-function buildSpell(spellType) {
-  let pos;
-  if (spellType === 'cure') {
-    pos = [user.pos[0] - 10, user.pos[1] - 220];
-  } else {
-    pos = [user.pos[0], user.pos[1]];
-  }
-  let spell = new Spell(spellType, pos, move);
-  activeSpell = spell;
 }
 
 async function passMoveToMonster() {
