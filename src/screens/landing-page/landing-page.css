@@ -1,0 +1,46 @@
+.landing-page,
+.landing-page button {
+  font-family: Georgia;
+}
+
+.landing-page h1 {
+  font-size: 60px;
+  margin: 50px 0px;
+}
+
+.landing-page button {
+  font-size: 30px;
+  text-decoration: none;
+  display: inline-block;
+  background: #23dcca;
+  padding: 10px 20px;
+  border: 2px solid #8b8b8b;
+  border-radius: 8px;
+  color: #006057;
+}
+
+.landing-page button:hover {
+  cursor: pointer;
+  text-decoration: underline;
+  color: #00413b;
+  border-color: #636363
+}
+
+.landing-page button:active,
+.landing-page button:focus {
+  outline: none;
+}
+
+.landing-page button:active {
+  background: #1ecab9;
+}
+
+.landing-page p {
+  margin: 50px 0px;
+  font-size: 20px;
+  font-style: italic;
+}
+
+.landing-page .printscreens img {
+  margin: 60px 25px;
+}

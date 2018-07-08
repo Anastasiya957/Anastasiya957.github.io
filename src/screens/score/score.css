@@ -1,0 +1,64 @@
+.game-records {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  text-align: center;
+}
+
+.game-records button {
+  font-family: Georgia;
+  padding: 5px 0px;
+  border-radius: 5px;
+  background: #00c1af;
+  outline: none;
+  margin-top: 40px;
+  height: 40px;
+  width: 160px;
+  font-size: 20px;
+}
+
+.game-records button:hover {
+  cursor: pointer;
+  background: #01ac9c;
+}
+
+.game-records h2 {
+  font-family: Georgia;
+  font-size: 50px;
+  margin: 40px 0px;
+}
+
+.game-records table {
+  font-family: Georgia;
+  margin: 0px auto;
+  width: 500px;
+  border-collapse: collapse;
+}
+
+.game-records thead {
+  background-color: #38a7ff;
+  font-size: 24px;
+}
+
+.game-records tbody {
+  font-size: 20px;
+}
+
+.game-records tbody tr:nth-child(2n + 1) {
+  background-color: #f3f3f3;
+}
+
+.game-records tbody tr:nth-child(2n) {
+  background-color: #deebff;
+}
+
+.game-records tr td:first-child,
+.game-records tr th:first-child {
+  width: 45%;
+}
+
+.game-records td, th {
+  border: 1px solid black;
+  text-align: center;
+  padding: 5px 0px;
+}

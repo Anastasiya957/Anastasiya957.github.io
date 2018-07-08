@@ -1,0 +1,13 @@
+.message {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  text-align: center;
+}
+
+.message p {
+  font-size: 70px;
+  color: #7d0000;
+  font-weight: bold;
+  margin-top: 20%;
+}

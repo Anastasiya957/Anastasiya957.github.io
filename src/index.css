@@ -1,0 +1,13 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-image: url("./images/bg.png");
+  background-repeat: repeat;
+}
+
+main {
+  text-align: center;
+}

@@ -1,0 +1,57 @@
+.modal-dialog {
+  font-size: 0px;
+  text-align: center;
+  font-family: Georgia;
+	background: #d1f1ff;
+	background-image: url("../../images/bg.png");
+	height: 320px;
+	width: 500px;
+	position: absolute;
+	top: 25%;
+	left: 50%;
+	margin-left: -250px;
+	border-radius: 15px;
+  box-shadow:
+   inset rgba(0,0,0,.5) -3px -3px 8px,
+   inset rgba(255,255,255,.9) 3px 3px 8px,
+   rgba(0,0,0,.8) 3px 3px 8px -3px;
+}
+
+.modal-dialog h2 {
+  font-size: 40px;
+  font-weight: normal;
+  margin: 20px 0px 10px;
+}
+
+
+.spells .spell {
+  display: inline-block;
+  width: 150px;
+  margin: 10px 5px;
+}
+.spells .spell img {
+  box-sizing: border-box;
+  width: 150px;
+  height: 150px;
+  background: #e8f8ff;
+  border: 1px solid #d3d3d3;
+  border-radius: 50%;
+}
+
+.spells .spell figcaption {
+  font-size: 25px;
+}
+
+.spells .spell img:hover,
+.spells .spell figcaption:hover {
+  cursor: pointer;
+}
+
+.spells .spell img:hover {
+  border: 2px solid #b2b2b2;
+}
+
+.spells .spell figcaption:hover {
+  text-decoration: underline;
+  color: #006d6d;
+}
